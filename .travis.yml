@@ -3,7 +3,7 @@ mono: none
 dotnet: 2.1.4
 dist: trusty
 install:
-  - dotnet restore
+  - dotnet restore ./src/XWindowManager.sln
 script:
   - dotnet build -c Release ./src/XWindowManager.sln
   - dotnet pack -c Release
