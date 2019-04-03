@@ -1,6 +1,6 @@
 using System;
 
-namespace wmctrl
+namespace X11
 {
     public class XWindowException : Exception
     {

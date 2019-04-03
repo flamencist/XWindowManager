@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace wmctrl
+namespace X11
 {
     public interface IXWindowManager : IDisposable
     {

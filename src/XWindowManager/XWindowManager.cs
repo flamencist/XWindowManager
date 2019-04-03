@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace wmctrl
+namespace X11
 {
     public class XWindowManager : IXWindowManager
     {
@@ -34,12 +34,17 @@ namespace wmctrl
             return TryGetXWindows(_display, out windows);
         }
 
+        public void Dispose()
+        {
+            Close();
+        }
+
         private void ThrowIfNotOpened()
         {
             if (_display.IsInvalid)
             {
                 throw new XWindowException(
-                    $"Display is not defined. Before call Open method before invoke the method.");
+                    "Display is not defined. Before call Open method before invoke the method.");
             }
         }
 
@@ -57,10 +62,7 @@ namespace wmctrl
                 for (var i = 0; i < (int) clientListSize / IntPtr.Size; i++)
                 {
                     var xWindowClass = GetXWindowClass(display, Marshal.ReadIntPtr(clientList.DangerousGetHandle(), i * IntPtr.Size));
-                    var classes = xWindowClass
-                        .Split('\0')
-                        .Where(_ => !string.IsNullOrWhiteSpace(_))
-                        .ToArray();
+                    var classes = ParseXWindowClass(xWindowClass);
                     windows.Add(new XWindowInfo {WmClass = classes});
                 }
             }
@@ -68,9 +70,12 @@ namespace wmctrl
             return true;
         }
 
-        public void Dispose()
+        private static string[] ParseXWindowClass(string xWindowClass)
         {
-            Close();
+            return xWindowClass
+                .Split('\0')
+                .Where(_ => !string.IsNullOrWhiteSpace(_))
+                .ToArray();
         }
 
         private static string GetXWindowClass(SafeHandle display, IntPtr win)
@@ -121,69 +126,5 @@ namespace wmctrl
             size = (ulong) actualFormatReturn / (32 / sizeof(long)) * nItemsReturn;
             return new XPropertyHandle(propReturn, false);
         }
-    }
-
-    internal class XPropertyHandle : SafeHandle
-    {
-        private readonly IntPtr _handle;
-        public XPropertyHandle(IntPtr invalidHandleValue, bool ownsHandle) : base(invalidHandleValue, ownsHandle)
-        {
-            _handle = invalidHandleValue;
-        }
-
-        protected override bool ReleaseHandle()
-        {
-            if (!IsInvalid)
-            {
-                return Native.XFree(this) == 0;
-            }
-
-            return false;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                ReleaseHandle();
-            }
-            base.Dispose(disposing);
-        }
-        
-        public override bool IsInvalid => _handle == IntPtr.Zero;
-    }
-    
-    internal class XDisplayHandle : SafeHandle
-    {
-        private readonly IntPtr _handle;
-        public XDisplayHandle(IntPtr invalidHandleValue, bool ownsHandle) : base(invalidHandleValue, ownsHandle)
-        {
-            _handle = invalidHandleValue;
-        }
-        
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                ReleaseHandle();
-            }
-            base.Dispose(disposing);
-        }
-
-        protected override bool ReleaseHandle()
-        {
-            try
-            {
-                Native.XCloseDisplay(this);
-            }
-            catch
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public override bool IsInvalid => _handle == IntPtr.Zero;
     }
 }

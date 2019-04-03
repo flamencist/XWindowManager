@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace wmctrl
+namespace X11
 {
     internal static class Native
     {
