@@ -6,7 +6,7 @@ install:
   - dotnet restore ./src/XWindowManager.sln
 script:
   - dotnet build -c Release ./src/XWindowManager.sln
-  - dotnet pack -c Release
+  - dotnet pack -c Release ./src/XWindowManager.sln
 deploy:
   skip_cleanup: true
   provider: script
