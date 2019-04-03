@@ -82,7 +82,7 @@ namespace X11
         {
             using (var wmClass = GetProperty(display, win, Native.XAtom.XA_STRING, "WM_CLASS", out var size))
             {
-                return wmClass.IsInvalid ? string.Empty:Marshal.PtrToStringUTF8(wmClass.DangerousGetHandle(), (int) size / 2);
+                return wmClass.IsInvalid ? string.Empty:Marshal.PtrToStringAuto(wmClass.DangerousGetHandle(), (int) size / 2);
             }
         }
 
