@@ -59,7 +59,7 @@ namespace X11
                     return false;
                 }
 
-                for (var i = 0; i < (int) clientListSize / IntPtr.Size; i++)
+                for (var i = 0; i < (int) clientListSize; i++)
                 {
                     var xWindowClass = GetXWindowClass(display, Marshal.ReadIntPtr(clientList.DangerousGetHandle(), i * IntPtr.Size));
                     var classes = ParseXWindowClass(xWindowClass);
@@ -82,7 +82,7 @@ namespace X11
         {
             using (var wmClass = GetProperty(display, win, Native.XAtom.XA_STRING, "WM_CLASS", out var size))
             {
-                return wmClass.IsInvalid ? string.Empty:Marshal.PtrToStringAuto(wmClass.DangerousGetHandle(), (int) size / 2);
+                return wmClass.IsInvalid ? string.Empty:Marshal.PtrToStringAnsi(wmClass.DangerousGetHandle(), (int) size );
             }
         }
 
@@ -123,7 +123,8 @@ namespace X11
                 return new XPropertyHandle(IntPtr.Zero, false);
             }
 
-            size = (ulong) actualFormatReturn / (32 / sizeof(long)) * nItemsReturn;
+//            size = (ulong) actualFormatReturn / (32 / sizeof(long)) * nItemsReturn;
+            size = nItemsReturn;
             return new XPropertyHandle(propReturn, false);
         }
     }
