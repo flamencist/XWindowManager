@@ -1,9 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Library</OutputType>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
-        <RootNamespace>X11</RootNamespace>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>X11</RootNamespace>
+    <Version>0.0.1</Version>
+    <AssemblyName>XWindowManager</AssemblyName>
+    <Authors>Alexander Chermyanin</Authors>
+    <Company>flamencist</Company>
+    <Description>X11 window manager.</Description>
+    <Product>XWindowManager</Product>
+    <PackageLicenseUrl>https://github.com/flamencist/XWindowManager/blob/master/license.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/flamencist/XWindowManager</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/flamencist/XWindowManager</RepositoryUrl>
+    <PackageReleaseNotes>initial release</PackageReleaseNotes>
+  </PropertyGroup>
 
 </Project>
