@@ -9,8 +9,6 @@ namespace X11
     {
         private SafeHandle _display;
 
-        public static IXWindowManager Instance { get; } = new XWindowManager();
-
         public void Open(string displayName)
         {
             _display = new XDisplayHandle(Native.XOpenDisplay(displayName), true);
@@ -63,7 +61,7 @@ namespace X11
                 {
                     var xWindowClass = GetXWindowClass(display, Marshal.ReadIntPtr(clientList.DangerousGetHandle(), i * IntPtr.Size));
                     var classes = ParseXWindowClass(xWindowClass);
-                    windows.Add(new XWindowInfo {WmClass = classes});
+                    windows.Add(new XWindowInfo {WmClass = new WmClass{InstanceName = classes[0], ClassName = classes[1]}});
                 }
             }
 

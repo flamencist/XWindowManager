@@ -8,7 +8,6 @@ X11 Window manager for linux on dotnet core.
 Sample usage
 
 ```cs
-
 using System;
 using X11;
 
@@ -20,14 +19,13 @@ namespace wmctrl
         {
             try
             {
-				var display = args.Length > 0 ? args[0] : null;
-                using (var wm = XWindowManager.Instance)
+                using (var wm = new XWindowManager())
                 {
-                    wm.Open(dispaly);
+                    wm.Open(args.Length > 0 ? args[0] : null);
 
                     if (wm.TryGetXWindows(out var windows))
                     {
-                        windows.ForEach(_ => Console.WriteLine(string.Join("\t", _.WmClass)));
+                        windows.ForEach(_=>Console.WriteLine($"{_.WmClass.InstanceName} {_.WmClass.ClassName}"));
                     }
                 }
             }
