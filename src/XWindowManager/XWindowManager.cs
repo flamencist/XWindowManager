@@ -59,9 +59,14 @@ namespace X11
 
                 for (var i = 0; i < (int) clientListSize; i++)
                 {
-                    var xWindowClass = GetXWindowClass(display, Marshal.ReadIntPtr(clientList.DangerousGetHandle(), i * IntPtr.Size));
+                    var win = Marshal.ReadIntPtr(clientList.DangerousGetHandle(), i * IntPtr.Size);
+                    var xWindowClass = GetXWindowClass(display, win);
                     var classes = ParseXWindowClass(xWindowClass);
-                    windows.Add(new XWindowInfo {WmClass = new WmClass{InstanceName = classes[0], ClassName = classes[1]}});
+                    windows.Add(new XWindowInfo
+                    {
+                        Id = win,
+                        WmClass = new WmClass{InstanceName = classes[0], ClassName = classes[1]}
+                    });
                 }
             }
 

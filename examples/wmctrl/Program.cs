@@ -15,8 +15,8 @@ namespace wmctrl
 
                     if (wm.TryGetXWindows(out var windows))
                     {
-                        Console.WriteLine($"Windows count {windows.Count}");
-                        windows.ForEach(_=>Console.WriteLine($"{_.WmClass.InstanceName} {_.WmClass.ClassName}"));
+                        Console.WriteLine($"Windows count {windows.Count}\n");
+                        windows.ForEach(_=>Console.WriteLine($"0x{_.Id.ToString("x8")} {_.WmClass.InstanceName} {_.WmClass.ClassName}"));
                     }
                 }
             }
