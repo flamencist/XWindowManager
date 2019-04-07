@@ -62,10 +62,12 @@ namespace X11
                     var win = Marshal.ReadIntPtr(clientList.DangerousGetHandle(), i * IntPtr.Size);
                     var xWindowClass = GetXWindowClass(display, win);
                     var classes = ParseXWindowClass(xWindowClass);
+                    var windowTitle = GetWindowTitle(display,win);
                     windows.Add(new XWindowInfo
                     {
                         Id = win,
-                        WmClass = new WmClass{InstanceName = classes[0], ClassName = classes[1]}
+                        WmClass = new WmClass{InstanceName = classes[0], ClassName = classes[1]},
+                        WmName = windowTitle
                     });
                 }
             }
@@ -85,8 +87,29 @@ namespace X11
         {
             using (var wmClass = GetProperty(display, win, Native.XAtom.XA_STRING, "WM_CLASS", out var size))
             {
-                return wmClass.IsInvalid ? string.Empty:Marshal.PtrToStringAnsi(wmClass.DangerousGetHandle(), (int) size );
+                return wmClass.IsInvalid ? string.Empty:GetString(wmClass, size);
             }
+        }
+
+        private static string GetString(SafeHandle handle, ulong size)
+        {
+            return handle.IsInvalid?null:Marshal.PtrToStringAnsi(handle.DangerousGetHandle(), (int) size );
+        }
+
+        private static string GetWindowTitle (SafeHandle display, IntPtr win) {
+            string netWmName;
+            using (var rawNetWmName = GetProperty(display, win, Native.XInternAtom(display, "UTF8_STRING", false), "_NET_WM_NAME", out var size))
+            {
+                netWmName = GetString(rawNetWmName, size);
+            }
+
+            string wmName;
+            using (var rawWmName = GetProperty(display, win, Native.XAtom.XA_STRING, "WM_NAME", out var sizeWmName))
+            {
+                wmName = GetString(rawWmName, sizeWmName);
+            }
+
+            return netWmName ?? wmName;
         }
 
         private static SafeHandle GetClientList(SafeHandle display, out ulong size)
@@ -108,20 +131,23 @@ namespace X11
 
 
         private static SafeHandle GetProperty(SafeHandle display, IntPtr win,
-            Native.XAtom xaPropType, string propName, out ulong size)
+            Native.XAtom xaPropType, string propName, out ulong size) =>
+            GetProperty(display, win, (ulong)xaPropType, propName, out size);
+
+        private static SafeHandle GetProperty(SafeHandle display, IntPtr win, ulong xaPropType, string propName, out ulong size)
         {
             size = 0;
 
             var xaPropName = Native.XInternAtom(display, propName, false);
 
             if (Native.XGetWindowProperty(display, win, xaPropName, 0,
-                    4096 / 4, false, (ulong) xaPropType, out var actualTypeReturn, out var actualFormatReturn,
+                    4096 / 4, false,  xaPropType, out var actualTypeReturn, out var actualFormatReturn,
                     out var nItemsReturn, out var bytesAfterReturn, out var propReturn) != 0)
             {
                 return new XPropertyHandle(IntPtr.Zero, false);
             }
 
-            if (actualTypeReturn != (ulong) xaPropType)
+            if (actualTypeReturn != xaPropType)
             {
                 return new XPropertyHandle(IntPtr.Zero, false);
             }
