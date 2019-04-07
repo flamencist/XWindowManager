@@ -7,5 +7,6 @@ namespace X11
         public IntPtr Id { get; set; }
         public WmClass WmClass { get; set; }
         public string WmName { get; set; }
+        public ulong WmPid { get; set; }
     }
 }

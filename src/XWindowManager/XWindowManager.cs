@@ -63,11 +63,13 @@ namespace X11
                     var xWindowClass = GetXWindowClass(display, win);
                     var classes = ParseXWindowClass(xWindowClass);
                     var windowTitle = GetWindowTitle(display,win);
+                    var pid = GetPid(display, win);
                     windows.Add(new XWindowInfo
                     {
                         Id = win,
                         WmClass = new WmClass{InstanceName = classes[0], ClassName = classes[1]},
-                        WmName = windowTitle
+                        WmName = windowTitle,
+                        WmPid = pid
                     });
                 }
             }
@@ -110,6 +112,14 @@ namespace X11
             }
 
             return netWmName ?? wmName;
+        }
+
+        private static ulong GetPid(SafeHandle display, IntPtr win)
+        {
+            using (var rawPid = GetProperty(display, win, Native.XAtom.XA_CARDINAL, "_NET_WM_PID", out _))
+            {
+                return Marshal.PtrToStructure<ulong>(rawPid.DangerousGetHandle());
+            }
         }
 
         private static SafeHandle GetClientList(SafeHandle display, out ulong size)
