@@ -8,5 +8,6 @@ namespace X11
         public WmClass WmClass { get; set; }
         public string WmName { get; set; }
         public ulong WmPid { get; set; }
+        public string WmClientMachine { get; set; }
     }
 }

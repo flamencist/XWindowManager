@@ -18,6 +18,7 @@ namespace wmctrl
                         Console.WriteLine($"Windows count {windows.Count}\n");
                         windows.ForEach(_=>Console.WriteLine($"0x{_.Id.ToString("x8")}" +
                                                              $" PID:{_.WmPid}" +
+                                                             $" Machine:{_.WmClientMachine}" +
                                                              $" {_.WmName}" +
                                                              $" {_.WmClass.InstanceName} {_.WmClass.ClassName}"));
                     }

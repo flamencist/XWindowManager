@@ -64,12 +64,14 @@ namespace X11
                     var classes = ParseXWindowClass(xWindowClass);
                     var windowTitle = GetWindowTitle(display,win);
                     var pid = GetPid(display, win);
+                    var clientMachine = GetClientMachine(display, win);
                     windows.Add(new XWindowInfo
                     {
                         Id = win,
                         WmClass = new WmClass{InstanceName = classes[0], ClassName = classes[1]},
                         WmName = windowTitle,
-                        WmPid = pid
+                        WmPid = pid,
+                        WmClientMachine = clientMachine
                     });
                 }
             }
@@ -90,6 +92,14 @@ namespace X11
             using (var wmClass = GetProperty(display, win, Native.XAtom.XA_STRING, "WM_CLASS", out var size))
             {
                 return wmClass.IsInvalid ? string.Empty:GetString(wmClass, size);
+            }
+        }
+
+        private static string GetClientMachine(SafeHandle display, IntPtr win)
+        {
+            using (var rawClientMachine = GetProperty(display, win, Native.XAtom.XA_STRING, "WM_CLIENT_MACHINE", out var size))
+            {
+                return GetString(rawClientMachine, size);
             }
         }
 
