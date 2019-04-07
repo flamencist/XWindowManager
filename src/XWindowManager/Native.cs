@@ -58,6 +58,10 @@ namespace X11
         [DllImport(X11)]
         internal static extern IntPtr XDefaultRootWindow(SafeHandle display);
 
+        [DllImport(X11)]
+        internal static extern int XGetGeometry(SafeHandle display, IntPtr drawable, out IntPtr rootReturn, out int xReturn, 
+            out int yReturn,out uint widthReturn,out uint heightReturn, out uint borderWidthReturn, out uint depthReturn);
+
         internal enum XAtom : ulong
         {
             XA_WINDOW = 33,

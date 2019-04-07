@@ -60,11 +60,13 @@ namespace X11
                 for (var i = 0; i < (int) clientListSize; i++)
                 {
                     var win = Marshal.ReadIntPtr(clientList.DangerousGetHandle(), i * IntPtr.Size);
-                    var xWindowClass = GetXWindowClass(display, win);
-                    var classes = ParseXWindowClass(xWindowClass);
+                    var classes = ParseXWindowClass(GetXWindowClass(display, win));
                     var windowTitle = GetWindowTitle(display,win);
                     var pid = GetPid(display, win);
                     var clientMachine = GetClientMachine(display, win);
+                    Native.XGetGeometry(display, win, out var junkRoot, out var junkX, out var junkY, out var width,
+                        out var height, out var borderWidth, out var depth);
+                    Console.WriteLine($"Geometry: 0x{junkRoot.ToString("x8")} {junkX} {junkY} {width} {height} {borderWidth} {depth}");
                     windows.Add(new XWindowInfo
                     {
                         Id = win,
@@ -87,19 +89,23 @@ namespace X11
                 .ToArray();
         }
 
-        private static string GetXWindowClass(SafeHandle display, IntPtr win)
+        private static string GetXWindowClass(SafeHandle display, IntPtr win) => GetPropertyString(display, win, "WM_CLASS");
+
+        private static string GetClientMachine(SafeHandle display, IntPtr win) => GetPropertyString(display, win, "WM_CLIENT_MACHINE");
+
+        private static string GetPropertyString(SafeHandle display, IntPtr win, string propName, ulong propType = (ulong) Native.XAtom.XA_STRING)
         {
-            using (var wmClass = GetProperty(display, win, Native.XAtom.XA_STRING, "WM_CLASS", out var size))
+            using (var handle = GetProperty(display, win, propType, propName, out var size))
             {
-                return wmClass.IsInvalid ? string.Empty:GetString(wmClass, size);
+                return GetString(handle, size);
             }
         }
 
-        private static string GetClientMachine(SafeHandle display, IntPtr win)
+        private static ulong GetPropertyNumber(SafeHandle display, IntPtr win, string propName)
         {
-            using (var rawClientMachine = GetProperty(display, win, Native.XAtom.XA_STRING, "WM_CLIENT_MACHINE", out var size))
+            using (var handle = GetProperty(display, win, Native.XAtom.XA_CARDINAL, propName, out _))
             {
-                return GetString(rawClientMachine, size);
+                return Marshal.PtrToStructure<ulong>(handle.DangerousGetHandle());
             }
         }
 
@@ -108,29 +114,14 @@ namespace X11
             return handle.IsInvalid?null:Marshal.PtrToStringAnsi(handle.DangerousGetHandle(), (int) size );
         }
 
-        private static string GetWindowTitle (SafeHandle display, IntPtr win) {
-            string netWmName;
-            using (var rawNetWmName = GetProperty(display, win, Native.XInternAtom(display, "UTF8_STRING", false), "_NET_WM_NAME", out var size))
-            {
-                netWmName = GetString(rawNetWmName, size);
-            }
-
-            string wmName;
-            using (var rawWmName = GetProperty(display, win, Native.XAtom.XA_STRING, "WM_NAME", out var sizeWmName))
-            {
-                wmName = GetString(rawWmName, sizeWmName);
-            }
-
+        private static string GetWindowTitle (SafeHandle display, IntPtr win)
+        {
+            var netWmName = GetPropertyString(display, win, "_NET_WM_NAME", Native.XInternAtom(display, "UTF8_STRING", false));
+            var wmName = GetPropertyString(display, win, "WM_NAME");
             return netWmName ?? wmName;
         }
 
-        private static ulong GetPid(SafeHandle display, IntPtr win)
-        {
-            using (var rawPid = GetProperty(display, win, Native.XAtom.XA_CARDINAL, "_NET_WM_PID", out _))
-            {
-                return Marshal.PtrToStructure<ulong>(rawPid.DangerousGetHandle());
-            }
-        }
+        private static ulong GetPid(SafeHandle display, IntPtr win) => GetPropertyNumber(display, win, "_NET_WM_PID");
 
         private static SafeHandle GetClientList(SafeHandle display, out ulong size)
         {
