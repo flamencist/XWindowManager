@@ -9,5 +9,6 @@ namespace X11
         public string WmName { get; set; }
         public ulong WmPid { get; set; }
         public string WmClientMachine { get; set; }
+        public Geometry Geometry { get; set; } = new Geometry();
     }
 }

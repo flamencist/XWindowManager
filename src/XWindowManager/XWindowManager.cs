@@ -60,20 +60,28 @@ namespace X11
                 for (var i = 0; i < (int) clientListSize; i++)
                 {
                     var win = Marshal.ReadIntPtr(clientList.DangerousGetHandle(), i * IntPtr.Size);
-                    var classes = ParseXWindowClass(GetXWindowClass(display, win));
+                    var wmClass = ParseWmClass(GetXWindowClass(display, win));
                     var windowTitle = GetWindowTitle(display,win);
                     var pid = GetPid(display, win);
                     var clientMachine = GetClientMachine(display, win);
                     Native.XGetGeometry(display, win, out var junkRoot, out var junkX, out var junkY, out var width,
                         out var height, out var borderWidth, out var depth);
-                    Console.WriteLine($"Geometry: 0x{junkRoot.ToString("x8")} {junkX} {junkY} {width} {height} {borderWidth} {depth}");
                     windows.Add(new XWindowInfo
                     {
                         Id = win,
-                        WmClass = new WmClass{InstanceName = classes[0], ClassName = classes[1]},
+                        WmClass = wmClass,
                         WmName = windowTitle,
                         WmPid = pid,
-                        WmClientMachine = clientMachine
+                        WmClientMachine = clientMachine,
+                        Geometry = new Geometry
+                        {
+                            X = junkX,
+                            Y=junkY,
+                            Width = width,
+                            Height = height,
+                            BorderWidth = borderWidth,
+                            Depth = depth
+                        }
                     });
                 }
             }
@@ -81,12 +89,16 @@ namespace X11
             return true;
         }
 
-        private static string[] ParseXWindowClass(string xWindowClass)
+        private static WmClass ParseWmClass(string xWindowClass)
         {
-            return xWindowClass
+            var classes =  xWindowClass
                 .Split('\0')
                 .Where(_ => !string.IsNullOrWhiteSpace(_))
                 .ToArray();
+            var instance = classes.Length > 0? classes[0] : string.Empty;
+            var @class = classes.Length > 1? classes[1] : string.Empty;
+            
+            return new WmClass {InstanceName = instance, ClassName = @class};
         }
 
         private static string GetXWindowClass(SafeHandle display, IntPtr win) => GetPropertyString(display, win, "WM_CLASS");
@@ -163,7 +175,6 @@ namespace X11
                 return new XPropertyHandle(IntPtr.Zero, false);
             }
 
-//            size = (ulong) actualFormatReturn / (32 / sizeof(long)) * nItemsReturn;
             size = nItemsReturn;
             return new XPropertyHandle(propReturn, false);
         }
