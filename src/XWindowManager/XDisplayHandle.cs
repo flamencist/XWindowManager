@@ -6,17 +6,19 @@ namespace X11
     internal class XDisplayHandle : SafeHandle
     {
         private readonly IntPtr _handle;
+
         public XDisplayHandle(IntPtr invalidHandleValue, bool ownsHandle) : base(invalidHandleValue, ownsHandle)
         {
             _handle = invalidHandleValue;
         }
-        
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 ReleaseHandle();
             }
+
             base.Dispose(disposing);
         }
 

@@ -6,6 +6,7 @@ namespace X11
     internal class XPropertyHandle : SafeHandle
     {
         private readonly IntPtr _handle;
+
         public XPropertyHandle(IntPtr invalidHandleValue, bool ownsHandle) : base(invalidHandleValue, ownsHandle)
         {
             _handle = invalidHandleValue;
@@ -27,9 +28,10 @@ namespace X11
             {
                 ReleaseHandle();
             }
+
             base.Dispose(disposing);
         }
-        
+
         public override bool IsInvalid => _handle == IntPtr.Zero;
     }
 }
