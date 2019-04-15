@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
     <RootNamespace>X11</RootNamespace>
-    <Version>0.0.2</Version>
+    <Version>0.1.0</Version>
     <AssemblyName>XWindowManager</AssemblyName>
     <Authors>Alexander Chermyanin</Authors>
     <Company>flamencist</Company>
@@ -13,7 +13,7 @@
     <PackageLicenseUrl>https://github.com/flamencist/XWindowManager/blob/master/license.md</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/flamencist/XWindowManager</PackageProjectUrl>
     <RepositoryUrl>https://github.com/flamencist/XWindowManager</RepositoryUrl>
-    <PackageReleaseNotes>move to netstandard</PackageReleaseNotes>
+    <PackageReleaseNotes>add new properties</PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>
