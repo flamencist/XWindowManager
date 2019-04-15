@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
     <RootNamespace>X11</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <AssemblyName>XWindowManager</AssemblyName>
     <Authors>Alexander Chermyanin</Authors>
     <Company>flamencist</Company>
