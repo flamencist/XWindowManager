@@ -102,7 +102,7 @@ namespace X11
         }
 
         private static string GetXWindowClass(SafeHandle display, IntPtr win) =>
-            GetPropertyString(display, win, "WM_CLASS");
+            GetPropertyString(display, win, "WM_CLASS") ?? string.Empty;
 
         private static string GetClientMachine(SafeHandle display, IntPtr win) =>
             GetPropertyString(display, win, "WM_CLIENT_MACHINE");
